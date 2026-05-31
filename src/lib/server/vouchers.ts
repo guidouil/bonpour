@@ -1,6 +1,7 @@
 import { and, asc, desc, eq, isNull, or } from 'drizzle-orm';
 import { db } from '$lib/server/db';
-import { voucher, voucherEvent } from '$lib/server/db/schema';
+import { voucher, voucherEvent, voucherOgImage } from '$lib/server/db/schema';
+import { renderVoucherPng } from '$lib/server/voucher-og';
 import { canTransition, getDisplayStatus, type VoucherStatus } from '$lib/voucher';
 import type { VoucherInput } from './voucher-validation';
 import { createManagementToken, createPublicSlug, hashManagementToken } from './voucher-secrets';
@@ -11,12 +12,14 @@ export async function createVoucher(input: VoucherInput, ownerId?: string) {
 	const publicSlug = createPublicSlug();
 	const managementToken = createManagementToken();
 	const managementTokenHash = hashManagementToken(managementToken);
+	const ogImage = renderVoucherPng(input);
 
 	const createdVoucher = await db.transaction(async (tx) => {
 		const [record] = await tx
 			.insert(voucher)
 			.values({ ...input, publicSlug, managementTokenHash, ownerId })
 			.returning();
+		await tx.insert(voucherOgImage).values({ voucherId: record.id, png: ogImage });
 		await tx.insert(voucherEvent).values({
 			voucherId: record.id,
 			type: 'created',
@@ -32,6 +35,27 @@ export async function getVoucherBySlug(publicSlug: string) {
 	return db.query.voucher.findFirst({
 		where: eq(voucher.publicSlug, publicSlug)
 	});
+}
+
+export async function getVoucherOgImageBySlug(publicSlug: string) {
+	const [storedImage] = await db
+		.select({ png: voucherOgImage.png })
+		.from(voucherOgImage)
+		.innerJoin(voucher, eq(voucherOgImage.voucherId, voucher.id))
+		.where(eq(voucher.publicSlug, publicSlug))
+		.limit(1);
+	if (storedImage) return storedImage.png;
+
+	// Existing vouchers created before PNG persistence are backfilled on first access.
+	const existingVoucher = await getVoucherBySlug(publicSlug);
+	if (!existingVoucher) return null;
+
+	const png = renderVoucherPng(existingVoucher);
+	await db
+		.insert(voucherOgImage)
+		.values({ voucherId: existingVoucher.id, png })
+		.onConflictDoNothing();
+	return png;
 }
 
 export async function getVoucherByManagementToken(token: string) {
