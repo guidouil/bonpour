@@ -1,0 +1,207 @@
+<script lang="ts">
+	import { enhance } from '$app/forms';
+	import VoucherCard from '$lib/components/VoucherCard.svelte';
+	import { untrack } from 'svelte';
+	import type { PageProps } from './$types';
+
+	let { data, form }: PageProps = $props();
+
+	let senderName = $state(untrack(() => form?.values?.senderName ?? ''));
+	let recipientName = $state(untrack(() => form?.values?.recipientName ?? ''));
+	let subject = $state(untrack(() => form?.values?.subject ?? ''));
+	let quantity = $state(untrack(() => form?.values?.quantity ?? ''));
+	let message = $state(untrack(() => form?.values?.message ?? ''));
+	let themeMode = $state<'system' | 'light' | 'dark'>(
+		untrack(() => {
+			const initialThemeMode = form?.values?.themeMode;
+			return initialThemeMode === 'light' || initialThemeMode === 'dark'
+				? initialThemeMode
+				: 'system';
+		})
+	);
+	let hasExpiration = $state(untrack(() => form?.values?.hasExpiration ?? true));
+	let expirationDate = $state(
+		untrack(() => form?.values?.expirationDate ?? data.defaultExpirationDate)
+	);
+</script>
+
+<svelte:head>
+	<title>BonPour · Un cadeau en pixels</title>
+</svelte:head>
+
+<main class="mx-auto max-w-6xl px-4 py-10 sm:px-6 sm:py-16">
+	<div class="mb-9 max-w-2xl">
+		<p class="text-xs font-extrabold tracking-[0.25em] site-accent uppercase">
+			Un cadeau en pixels
+		</p>
+		<h1 class="mt-4 font-serif text-5xl leading-[0.98] font-semibold site-ink sm:text-6xl">
+			Un joli bon,<br /><span class="site-accent italic">tout simplement.</span>
+		</h1>
+		<p class="mt-5 max-w-xl text-sm leading-6 site-muted sm:text-base sm:leading-7">
+			Pour une blague, une attention ou une promesse. Crée ton bon, partage le lien et suis sa
+			petite histoire.
+		</p>
+	</div>
+
+	<div class="grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(22rem,0.88fr)] lg:gap-12">
+		<form method="post" use:enhance class="space-y-5 rounded-3xl surface-card p-5 shadow-sm sm:p-7">
+			<div class="grid gap-5 sm:grid-cols-2">
+				<label>
+					<span class="field-label">De la part de</span>
+					<input
+						class="field"
+						name="senderName"
+						placeholder="Camille"
+						maxlength="60"
+						required
+						bind:value={senderName}
+					/>
+					{#if form?.errors?.senderName}<span class="error-text">{form.errors.senderName}</span
+						>{/if}
+				</label>
+				<label>
+					<span class="field-label">Pour</span>
+					<input
+						class="field"
+						name="recipientName"
+						placeholder="Alex"
+						maxlength="60"
+						required
+						bind:value={recipientName}
+					/>
+					{#if form?.errors?.recipientName}<span class="error-text"
+							>{form.errors.recipientName}</span
+						>{/if}
+				</label>
+			</div>
+
+			<label>
+				<span class="field-label">Bon pour…</span>
+				<input
+					class="field"
+					name="subject"
+					placeholder="un brunch maison au lit"
+					maxlength="120"
+					required
+					bind:value={subject}
+				/>
+				{#if form?.errors?.subject}<span class="error-text">{form.errors.subject}</span>{/if}
+			</label>
+
+			<div class="grid gap-5 mt-4 sm:grid-cols-[8rem_1fr]">
+				<label>
+					<span class="field-label">Quantité</span>
+					<input
+						class="field"
+						type="number"
+						name="quantity"
+						placeholder="1"
+						min="1"
+						max="999"
+						bind:value={quantity}
+					/>
+					{#if form?.errors?.quantity}<span class="error-text">{form.errors.quantity}</span>{/if}
+				</label>
+				<label>
+					<span class="field-label">Petit mot <span class="normal-case">(facultatif)</span></span>
+					<textarea
+						class="field min-h-24 resize-y"
+						name="message"
+						placeholder="À utiliser sans modération…"
+						maxlength="280"
+						bind:value={message}
+					></textarea>
+					{#if form?.errors?.message}<span class="error-text">{form.errors.message}</span>{/if}
+				</label>
+			</div>
+
+			<fieldset>
+				<legend class="field-label">Style du bon</legend>
+				<div class="grid grid-cols-3 gap-2">
+					<label
+						class="theme-choice cursor-pointer rounded-xl border px-3 py-3 text-center text-xs font-bold"
+					>
+						<input
+							class="sr-only"
+							type="radio"
+							name="themeMode"
+							value="system"
+							bind:group={themeMode}
+						/>
+						Système
+					</label>
+					<label
+						class="theme-choice cursor-pointer rounded-xl border px-3 py-3 text-center text-xs font-bold"
+					>
+						<input
+							class="sr-only"
+							type="radio"
+							name="themeMode"
+							value="light"
+							bind:group={themeMode}
+						/>
+						Clair
+					</label>
+					<label
+						class="theme-choice cursor-pointer rounded-xl border px-3 py-3 text-center text-xs font-bold"
+					>
+						<input
+							class="sr-only"
+							type="radio"
+							name="themeMode"
+							value="dark"
+							bind:group={themeMode}
+						/>
+						Sombre
+					</label>
+				</div>
+				<p class="site-soft mt-2 text-xs">Système suit automatiquement le thème de l’appareil.</p>
+				{#if form?.errors?.themeMode}<span class="error-text">{form.errors.themeMode}</span>{/if}
+			</fieldset>
+
+			<div class="rounded-2xl border site-border surface-muted p-4">
+				<label class="flex items-center gap-3 text-sm font-semibold site-muted">
+					<input
+						class="rounded site-accent"
+						type="checkbox"
+						name="hasExpiration"
+						bind:checked={hasExpiration}
+					/>
+					Ajouter une date de fin
+				</label>
+				{#if hasExpiration}
+					<label class="mt-4 block">
+						<span class="field-label">Valable jusqu’au</span>
+						<input class="field" type="date" name="expirationDate" bind:value={expirationDate} />
+						{#if form?.errors?.expirationDate}<span class="error-text"
+								>{form.errors.expirationDate}</span
+							>{/if}
+					</label>
+				{/if}
+			</div>
+
+			<button class="primary-button w-full" type="submit">Créer mon bon</button>
+			<p class="text-center text-xs leading-5 site-soft">
+				Pas besoin de compte. Un lien secret te permettra de suivre ce bon.
+			</p>
+		</form>
+
+		<div class="lg:sticky lg:top-8 lg:self-start">
+			<p
+				class="mb-3 text-center text-[0.65rem] font-extrabold tracking-[0.2em] site-soft uppercase"
+			>
+				Aperçu en direct
+			</p>
+			<VoucherCard
+				{senderName}
+				{recipientName}
+				{subject}
+				quantity={quantity ? Number(quantity) : null}
+				{message}
+				{themeMode}
+				expiresAt={hasExpiration ? expirationDate : null}
+				preview
+			/>
+		</div>
+	</div>
+</main>

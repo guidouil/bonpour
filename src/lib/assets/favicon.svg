@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+	<title>BonPour</title>
+	<rect width="64" height="64" rx="18" fill="#26352d" />
+	<circle cx="46" cy="18" r="10" fill="#cf684d" />
+	<path fill="#fffaf0" d="M16 16h17c7 0 11 3 11 9 0 4-2 7-6 8 5 1 8 4 8 9 0 7-5 11-13 11H16zm15 14c4 0 6-1 6-4s-2-4-6-4h-8v8zm1 17c5 0 7-2 7-5s-2-5-7-5h-9v10z" />
+</svg>

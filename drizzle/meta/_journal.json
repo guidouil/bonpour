@@ -1,0 +1,20 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1780214838247,
+      "tag": "0000_hot_energizer",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1780216306028,
+      "tag": "0001_voucher-theme",
+      "breakpoints": true
+    }
+  ]
+}
