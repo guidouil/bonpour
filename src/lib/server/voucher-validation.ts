@@ -1,4 +1,9 @@
-import { voucherThemes, type VoucherTheme } from '$lib/voucher';
+import {
+	voucherThemeModes,
+	voucherThemes,
+	type VoucherTheme,
+	type VoucherThemeMode
+} from '$lib/voucher';
 
 export type VoucherInput = {
 	senderName: string;
@@ -6,7 +11,8 @@ export type VoucherInput = {
 	subject: string;
 	quantity: number | null;
 	message: string | null;
-	themeMode: VoucherTheme;
+	theme: VoucherTheme;
+	themeMode: VoucherThemeMode;
 	expiresAt: Date | null;
 };
 
@@ -17,6 +23,7 @@ export type VoucherFormValues = Record<
 	| 'quantity'
 	| 'message'
 	| 'expirationDate'
+	| 'theme'
 	| 'themeMode',
 	string
 > & { hasExpiration: boolean };
@@ -41,6 +48,7 @@ export function parseVoucherForm(formData: FormData, now = new Date()) {
 		quantity: field(formData, 'quantity'),
 		message: field(formData, 'message'),
 		expirationDate: field(formData, 'expirationDate'),
+		theme: field(formData, 'theme') || 'terracotta',
 		themeMode: field(formData, 'themeMode') || 'system',
 		hasExpiration: formData.get('hasExpiration') === 'on'
 	};
@@ -58,7 +66,10 @@ export function parseVoucherForm(formData: FormData, now = new Date()) {
 	if (values.message.length > 280) {
 		errors.message = 'Le petit mot ne peut pas dépasser 280 caractères.';
 	}
-	if (!voucherThemes.includes(values.themeMode as VoucherTheme)) {
+	if (!voucherThemes.includes(values.theme as VoucherTheme)) {
+		errors.theme = 'Choisis un thème de couleurs valide.';
+	}
+	if (!voucherThemeModes.includes(values.themeMode as VoucherThemeMode)) {
 		errors.themeMode = 'Choisis un style de bon valide.';
 	}
 
@@ -88,7 +99,8 @@ export function parseVoucherForm(formData: FormData, now = new Date()) {
 			subject: values.subject,
 			quantity,
 			message: values.message || null,
-			themeMode: values.themeMode as VoucherTheme,
+			theme: values.theme as VoucherTheme,
+			themeMode: values.themeMode as VoucherThemeMode,
 			expiresAt
 		} satisfies VoucherInput
 	};

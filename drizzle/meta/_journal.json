@@ -22,6 +22,20 @@
       "when": 1780240781277,
       "tag": "0002_lazy_purple_man",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1780242100366,
+      "tag": "0003_sour_terror",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1780242321505,
+      "tag": "0004_replace-honey-with-love",
+      "breakpoints": true
     }
   ]
 }

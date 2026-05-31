@@ -18,6 +18,9 @@ export const voucher = pgTable(
 		subject: text('subject').notNull(),
 		quantity: integer('quantity'),
 		message: text('message'),
+		theme: text('theme', { enum: ['terracotta', 'ocean', 'lavender', 'love'] })
+			.notNull()
+			.default('terracotta'),
 		themeMode: text('theme_mode', { enum: ['system', 'light', 'dark'] })
 			.notNull()
 			.default('system'),

@@ -1,13 +1,97 @@
 import { Resvg } from '@resvg/resvg-js';
-import type { VoucherTheme } from '$lib/voucher';
+import type { VoucherTheme, VoucherThemeMode } from '$lib/voucher';
 
 type OgVoucher = {
 	senderName: string;
 	recipientName: string;
 	subject: string;
 	quantity: number | null;
-	themeMode: VoucherTheme;
+	theme: VoucherTheme;
+	themeMode: VoucherThemeMode;
 };
+
+const voucherColors = {
+	terracotta: {
+		light: {
+			page: '#e8dfce',
+			card: '#fffaf0',
+			border: '#26352d',
+			dashed: '#d9cbb5',
+			accent: '#cf684d',
+			ink: '#26352d',
+			muted: '#6c786f'
+		},
+		dark: {
+			page: '#17231f',
+			card: '#26352d',
+			border: '#d7c6aa',
+			dashed: '#6f806f',
+			accent: '#e47c60',
+			ink: '#fff6e7',
+			muted: '#c9d2c8'
+		}
+	},
+	ocean: {
+		light: {
+			page: '#dceceb',
+			card: '#f2fbfa',
+			border: '#21474d',
+			dashed: '#b7d7d5',
+			accent: '#2f7f88',
+			ink: '#21474d',
+			muted: '#5c7779'
+		},
+		dark: {
+			page: '#10282d',
+			card: '#173238',
+			border: '#b9d9d8',
+			dashed: '#507277',
+			accent: '#69c5cc',
+			ink: '#eefcfb',
+			muted: '#b7d0d0'
+		}
+	},
+	lavender: {
+		light: {
+			page: '#eee7f5',
+			card: '#fbf8ff',
+			border: '#433653',
+			dashed: '#d9cce8',
+			accent: '#8b6bb3',
+			ink: '#433653',
+			muted: '#756a7f'
+		},
+		dark: {
+			page: '#241b2d',
+			card: '#30263b',
+			border: '#e0d1f3',
+			dashed: '#68577b',
+			accent: '#c2a0ee',
+			ink: '#fff8ff',
+			muted: '#d5c6de'
+		}
+	},
+	love: {
+		light: {
+			page: '#f4e1e5',
+			card: '#fff5f7',
+			border: '#692d3a',
+			dashed: '#efc7d0',
+			accent: '#c23b5a',
+			ink: '#692d3a',
+			muted: '#8a6170'
+		},
+		dark: {
+			page: '#321720',
+			card: '#431f2a',
+			border: '#f4c5d0',
+			dashed: '#895364',
+			accent: '#ff8194',
+			ink: '#fff5f7',
+			muted: '#e7c3cb'
+		}
+	}
+} satisfies Record<VoucherTheme, Record<'light' | 'dark', Record<string, string>>>;
 
 export function escapeXml(value: string) {
 	return value
@@ -38,25 +122,7 @@ function wrapText(value: string, maxCharacters = 27) {
 
 export function renderVoucherSvg(voucher: OgVoucher) {
 	const dark = voucher.themeMode === 'dark';
-	const colors = dark
-		? {
-				page: '#17231f',
-				card: '#26352d',
-				border: '#d7c6aa',
-				dashed: '#6f806f',
-				accent: '#e47c60',
-				ink: '#fff6e7',
-				muted: '#c9d2c8'
-			}
-		: {
-				page: '#e8dfce',
-				card: '#fffaf0',
-				border: '#26352d',
-				dashed: '#d9cbb5',
-				accent: '#cf684d',
-				ink: '#26352d',
-				muted: '#6c786f'
-			};
+	const colors = voucherColors[voucher.theme][dark ? 'dark' : 'light'];
 	const subjectLines = wrapText(voucher.subject);
 	const subject = subjectLines
 		.map(

@@ -1,17 +1,29 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import VoucherCard from '$lib/components/VoucherCard.svelte';
+	import {
+		voucherThemeLabels,
+		voucherThemes,
+		type VoucherTheme,
+		type VoucherThemeMode
+	} from '$lib/voucher';
 	import { untrack } from 'svelte';
 	import type { PageProps } from './$types';
 
 	let { data, form }: PageProps = $props();
 
-	let senderName = $state(untrack(() => form?.values?.senderName ?? ''));
+	let senderName = $state(untrack(() => form?.values?.senderName ?? data.user?.name ?? ''));
 	let recipientName = $state(untrack(() => form?.values?.recipientName ?? ''));
 	let subject = $state(untrack(() => form?.values?.subject ?? ''));
 	let quantity = $state(untrack(() => form?.values?.quantity ?? ''));
 	let message = $state(untrack(() => form?.values?.message ?? ''));
-	let themeMode = $state<'system' | 'light' | 'dark'>(
+	let theme = $state<VoucherTheme>(
+		untrack(() => {
+			const initialTheme = form?.values?.theme as VoucherTheme;
+			return voucherThemes.includes(initialTheme) ? initialTheme : 'terracotta';
+		})
+	);
+	let themeMode = $state<VoucherThemeMode>(
 		untrack(() => {
 			const initialThemeMode = form?.values?.themeMode;
 			return initialThemeMode === 'light' || initialThemeMode === 'dark'
@@ -116,44 +128,48 @@
 			</div>
 
 			<fieldset>
-				<legend class="field-label">Style du bon</legend>
+				<legend class="field-label">Couleurs du bon</legend>
+				<div class="grid grid-cols-2 gap-2 sm:grid-cols-4">
+					{#each voucherThemes as voucherTheme (voucherTheme)}
+						<label
+							class={`theme-choice palette-choice palette-${voucherTheme} cursor-pointer rounded-xl border px-3 py-3 text-center text-xs font-bold`}
+						>
+							<input
+								class="sr-only"
+								type="radio"
+								name="theme"
+								value={voucherTheme}
+								bind:group={theme}
+							/>
+							<span class="mb-2 flex justify-center gap-1" aria-hidden="true">
+								<span class="palette-dot palette-dot-main"></span>
+								<span class="palette-dot palette-dot-accent"></span>
+								<span class="palette-dot palette-dot-soft"></span>
+							</span>
+							{voucherThemeLabels[voucherTheme]}
+						</label>
+					{/each}
+				</div>
+				{#if form?.errors?.theme}<span class="error-text">{form.errors.theme}</span>{/if}
+			</fieldset>
+
+			<fieldset>
+				<legend class="field-label">Apparence</legend>
 				<div class="grid grid-cols-3 gap-2">
-					<label
-						class="theme-choice cursor-pointer rounded-xl border px-3 py-3 text-center text-xs font-bold"
-					>
-						<input
-							class="sr-only"
-							type="radio"
-							name="themeMode"
-							value="system"
-							bind:group={themeMode}
-						/>
-						Système
-					</label>
-					<label
-						class="theme-choice cursor-pointer rounded-xl border px-3 py-3 text-center text-xs font-bold"
-					>
-						<input
-							class="sr-only"
-							type="radio"
-							name="themeMode"
-							value="light"
-							bind:group={themeMode}
-						/>
-						Clair
-					</label>
-					<label
-						class="theme-choice cursor-pointer rounded-xl border px-3 py-3 text-center text-xs font-bold"
-					>
-						<input
-							class="sr-only"
-							type="radio"
-							name="themeMode"
-							value="dark"
-							bind:group={themeMode}
-						/>
-						Sombre
-					</label>
+					{#each [{ value: 'system', label: 'Système' }, { value: 'light', label: 'Clair' }, { value: 'dark', label: 'Sombre' }] as mode (mode.value)}
+						<label
+							class="theme-choice cursor-pointer rounded-xl border px-3 py-3 text-center text-xs font-bold"
+						>
+							<input
+								class="sr-only"
+								type="radio"
+								name="themeMode"
+								value={mode.value}
+								bind:group={themeMode}
+							/>
+							{mode.label}
+						</label>
+					{/each}
 				</div>
 				<p class="site-soft mt-2 text-xs">Système suit automatiquement le thème de l’appareil.</p>
 				{#if form?.errors?.themeMode}<span class="error-text">{form.errors.themeMode}</span>{/if}
@@ -198,6 +214,7 @@
 				{subject}
 				quantity={quantity ? Number(quantity) : null}
 				{message}
+				{theme}
 				{themeMode}
 				expiresAt={hasExpiration ? expirationDate : null}
 				preview

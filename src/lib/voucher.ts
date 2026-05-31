@@ -10,8 +10,16 @@ export const voucherStatuses = [
 
 export type VoucherStatus = (typeof voucherStatuses)[number];
 export type DisplayStatus = VoucherStatus | 'expired';
-export const voucherThemes = ['system', 'light', 'dark'] as const;
+export const voucherThemes = ['terracotta', 'ocean', 'lavender', 'love'] as const;
 export type VoucherTheme = (typeof voucherThemes)[number];
+export const voucherThemeLabels: Record<VoucherTheme, string> = {
+	terracotta: 'Terracotta',
+	ocean: 'Océan',
+	lavender: 'Lavande',
+	love: 'Rose'
+};
+export const voucherThemeModes = ['system', 'light', 'dark'] as const;
+export type VoucherThemeMode = (typeof voucherThemeModes)[number];
 
 export type VoucherView = {
 	senderName: string;

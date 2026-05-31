@@ -3,7 +3,8 @@ import { expect, test } from '@playwright/test';
 async function createAnonymousVoucher(
 	page: import('@playwright/test').Page,
 	subject: string,
-	themeMode: 'Système' | 'Clair' | 'Sombre' = 'Système'
+	themeMode: 'Système' | 'Clair' | 'Sombre' = 'Système',
+	theme: 'Terracotta' | 'Océan' | 'Lavande' | 'Rose' = 'Terracotta'
 ) {
 	await page.goto('/');
 	await page.getByLabel('De la part de', { exact: true }).fill('Camille');
@@ -13,6 +14,7 @@ async function createAnonymousVoucher(
 	await page
 		.getByLabel('Petit mot (facultatif)', { exact: true })
 		.fill('À utiliser dès dimanche matin.');
+	await page.getByText(theme, { exact: true }).click();
 	await page.getByText(themeMode, { exact: true }).click();
 	await page.getByRole('button', { name: 'Créer mon bon' }).click();
 	await expect(page).toHaveURL(/\/gestion\/.+\?cree=1$/);
@@ -31,15 +33,18 @@ test('follows the OS theme by default and allows a voucher override', async ({ p
 	await expect(page.getByLabel('Système', { exact: true })).toBeChecked();
 	await expect(page.locator('.voucher-card')).toHaveCSS('background-color', 'rgb(38, 53, 45)');
 
+	await page.getByText('Océan', { exact: true }).click();
+	await expect(page.locator('.voucher-card')).toHaveCSS('background-color', 'rgb(23, 50, 56)');
+
 	await page.getByText('Clair', { exact: true }).click();
-	await expect(page.locator('.voucher-card')).toHaveCSS('background-color', 'rgb(255, 250, 240)');
+	await expect(page.locator('.voucher-card')).toHaveCSS('background-color', 'rgb(242, 251, 250)');
 
 	await page.getByText('Sombre', { exact: true }).click();
-	await expect(page.locator('.voucher-card')).toHaveCSS('background-color', 'rgb(38, 53, 45)');
+	await expect(page.locator('.voucher-card')).toHaveCSS('background-color', 'rgb(23, 50, 56)');
 });
 
 test('creates, shares, accepts and redeems an anonymous voucher', async ({ page, request }) => {
-	const voucher = await createAnonymousVoucher(page, 'un brunch maison au lit', 'Sombre');
+	const voucher = await createAnonymousVoucher(page, 'un brunch maison au lit', 'Sombre', 'Océan');
 
 	await page.getByRole('button', { name: 'Copier le lien' }).click();
 	await expect(page.getByText('État actuel :')).toContainText('Envoyé');
@@ -52,7 +57,7 @@ test('creates, shares, accepts and redeems an anonymous voucher', async ({ page,
 	);
 
 	await page.goto(voucher.publicUrl);
-	await expect(page.locator('.voucher-card')).toHaveCSS('background-color', 'rgb(38, 53, 45)');
+	await expect(page.locator('.voucher-card')).toHaveCSS('background-color', 'rgb(23, 50, 56)');
 	await page.getByRole('button', { name: 'Accepter' }).click();
 	await expect(page.getByText('Accepté. Il ne reste plus qu’à en profiter.')).toBeVisible();
 
@@ -72,6 +77,17 @@ test('attaches an anonymous voucher to an optional account', async ({ page }) =>
 	await page.getByLabel('Mot de passe', { exact: true }).fill('bonpour-test-2026');
 	await page.getByRole('button', { name: 'Créer mon compte' }).click();
 	await expect(page).toHaveURL('/mes-bons');
+
+	await page.goto('/');
+	await expect(page.getByLabel('De la part de', { exact: true })).toHaveValue('Camille Test');
+
+	await page.goto('/mes-bons');
+	await page.getByLabel('Mon nom', { exact: true }).fill('Camille Profil');
+	await page.getByRole('button', { name: 'Enregistrer' }).click();
+	await expect(page.getByText('Nom modifié.')).toBeVisible();
+
+	await page.goto('/');
+	await expect(page.getByLabel('De la part de', { exact: true })).toHaveValue('Camille Profil');
 
 	await page.goto(voucher.managementUrl);
 	await page.getByRole('button', { name: 'Rattacher à mon compte' }).click();

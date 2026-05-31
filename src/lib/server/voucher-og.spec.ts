@@ -6,6 +6,7 @@ const voucher = {
 	recipientName: 'Alex',
 	subject: 'un brunch & une surprise',
 	quantity: 2,
+	theme: 'terracotta' as const,
 	themeMode: 'system' as const
 };
 
@@ -27,5 +28,18 @@ describe('voucher Open Graph rendering', () => {
 		expect(svg).toContain('#17231f');
 		expect(svg).toContain('#fff6e7');
 		expect(svg).not.toContain('#fffaf0');
+	});
+
+	it('renders the selected color theme', () => {
+		const svg = renderVoucherSvg({ ...voucher, theme: 'ocean' });
+		expect(svg).toContain('#f2fbfa');
+		expect(svg).toContain('#2f7f88');
+		expect(svg).not.toContain('#cf684d');
+	});
+
+	it('renders the love theme with its dark palette', () => {
+		const svg = renderVoucherSvg({ ...voucher, theme: 'love', themeMode: 'dark' });
+		expect(svg).toContain('#431f2a');
+		expect(svg).toContain('#ff8194');
 	});
 });

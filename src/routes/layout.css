@@ -113,6 +113,46 @@
 		color: var(--ink);
 	}
 
+	.palette-choice {
+		--palette-main: #26352d;
+		--palette-accent: #cf684d;
+		--palette-soft: #d9cbb5;
+	}
+
+	.palette-ocean {
+		--palette-main: #21474d;
+		--palette-accent: #2f7f88;
+		--palette-soft: #b7d7d5;
+	}
+
+	.palette-lavender {
+		--palette-main: #433653;
+		--palette-accent: #8b6bb3;
+		--palette-soft: #d9cce8;
+	}
+
+	.palette-love {
+		--palette-main: #692d3a;
+		--palette-accent: #c23b5a;
+		--palette-soft: #efc7d0;
+	}
+
+	.palette-dot {
+		@apply block size-3 rounded-full;
+	}
+
+	.palette-dot-main {
+		background: var(--palette-main);
+	}
+
+	.palette-dot-accent {
+		background: var(--palette-accent);
+	}
+
+	.palette-dot-soft {
+		background: var(--palette-soft);
+	}
+
 	.field-label {
 		@apply mb-2 block text-[0.65rem] font-extrabold tracking-[0.18em] uppercase;
 		color: var(--ink-muted);

@@ -9,6 +9,7 @@ function validForm() {
 		['subject', 'un brunch maison'],
 		['quantity', '2'],
 		['message', 'Avec plaisir'],
+		['theme', 'ocean'],
 		['themeMode', 'dark'],
 		['hasExpiration', 'on'],
 		['expirationDate', '2026-06-30']
@@ -20,7 +21,12 @@ function validForm() {
 describe('voucher form validation', () => {
 	it('parses valid fields', () => {
 		const result = parseVoucherForm(validForm(), new Date('2026-05-31T12:00:00Z'));
-		expect(result.input).toMatchObject({ senderName: 'Camille', quantity: 2, themeMode: 'dark' });
+		expect(result.input).toMatchObject({
+			senderName: 'Camille',
+			quantity: 2,
+			theme: 'ocean',
+			themeMode: 'dark'
+		});
 	});
 
 	it('rejects invalid quantity and expired dates', () => {
@@ -40,11 +46,21 @@ describe('voucher form validation', () => {
 
 	it('defaults to the system theme and rejects unknown modes', () => {
 		const form = validForm();
+		form.delete('theme');
 		form.delete('themeMode');
+		expect(parseVoucherForm(form, new Date('2026-05-31T12:00:00Z')).input?.theme).toBe(
+			'terracotta'
+		);
 		expect(parseVoucherForm(form, new Date('2026-05-31T12:00:00Z')).input?.themeMode).toBe(
 			'system'
 		);
 
+		form.set('theme', 'sepia');
+		expect(parseVoucherForm(form, new Date('2026-05-31T12:00:00Z')).errors).toMatchObject({
+			theme: expect.any(String)
+		});
+
+		form.set('theme', 'terracotta');
 		form.set('themeMode', 'sepia');
 		expect(parseVoucherForm(form, new Date('2026-05-31T12:00:00Z')).errors).toMatchObject({
 			themeMode: expect.any(String)

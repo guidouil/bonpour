@@ -1,9 +1,10 @@
 <script lang="ts">
+	import { enhance } from '$app/forms';
 	import { resolve } from '$app/paths';
 	import { statusLabels } from '$lib/voucher';
 	import type { PageProps } from './$types';
 
-	let { data }: PageProps = $props();
+	let { data, form }: PageProps = $props();
 </script>
 
 <svelte:head>
@@ -21,6 +22,30 @@
 		</div>
 		<a class="primary-button" href={resolve('/')}>Créer un bon</a>
 	</div>
+
+	<form
+		method="post"
+		action="?/updateName"
+		use:enhance
+		class="mt-8 rounded-3xl surface-card p-5 shadow-sm sm:flex sm:items-end sm:gap-4"
+	>
+		<label class="block flex-1">
+			<span class="field-label">Mon nom</span>
+			<input
+				class="field"
+				name="name"
+				autocomplete="name"
+				value={form?.name ?? data.user.name}
+				maxlength="60"
+				required
+			/>
+		</label>
+		<button class="secondary-button mt-4 w-full sm:mt-0 sm:w-auto" type="submit">
+			Enregistrer
+		</button>
+		{#if form?.message}<p class="error-text sm:mb-3">{form.message}</p>{/if}
+		{#if form?.success}<p class="mt-3 text-xs site-accent sm:mb-3">Nom modifié.</p>{/if}
+	</form>
 
 	{#if data.vouchers.length}
 		<div class="mt-8 grid gap-4 sm:grid-cols-2">

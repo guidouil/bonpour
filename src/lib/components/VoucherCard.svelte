@@ -3,7 +3,8 @@
 		getDisplayStatus,
 		statusLabels,
 		type VoucherStatus,
-		type VoucherTheme
+		type VoucherTheme,
+		type VoucherThemeMode
 	} from '$lib/voucher';
 
 	let {
@@ -14,6 +15,7 @@
 		message = null,
 		expiresAt = null,
 		status = 'created',
+		theme = 'terracotta',
 		themeMode = 'system',
 		preview = false
 	}: {
@@ -24,7 +26,8 @@
 		message?: string | null;
 		expiresAt?: Date | string | null;
 		status?: VoucherStatus;
-		themeMode?: VoucherTheme;
+		theme?: VoucherTheme;
+		themeMode?: VoucherThemeMode;
 		preview?: boolean;
 	} = $props();
 
@@ -38,7 +41,7 @@
 	);
 </script>
 
-<article class={`voucher-card theme-${themeMode}`}>
+<article class={`voucher-card voucher-theme-${theme} theme-mode-${themeMode}`}>
 	<div class="voucher-inner">
 		<div class="flex items-start justify-between gap-3">
 			<div>
@@ -84,7 +87,7 @@
 				{#if formattedExpiration}
 					<p class="voucher-soft max-w-32 text-[0.63rem] leading-4">
 						Valable jusqu’au
-						<br/>{formattedExpiration}
+						<br />{formattedExpiration}
 					</p>
 				{:else}
 					<p class="voucher-soft mt-1 text-[0.63rem]">Sans date limite</p>
@@ -144,7 +147,40 @@
 		width: 3.2rem;
 	}
 
-	.theme-dark {
+	.voucher-theme-ocean {
+		--voucher-accent: #2f7f88;
+		--voucher-bg: #f2fbfa;
+		--voucher-border: #21474d;
+		--voucher-dashed: #b7d7d5;
+		--voucher-ink: #21474d;
+		--voucher-muted: #5c7779;
+		--voucher-soft: #7b9494;
+		--voucher-warm: #a26d4f;
+	}
+
+	.voucher-theme-lavender {
+		--voucher-accent: #8b6bb3;
+		--voucher-bg: #fbf8ff;
+		--voucher-border: #433653;
+		--voucher-dashed: #d9cce8;
+		--voucher-ink: #433653;
+		--voucher-muted: #756a7f;
+		--voucher-soft: #94889e;
+		--voucher-warm: #ae7185;
+	}
+
+	.voucher-theme-love {
+		--voucher-accent: #c23b5a;
+		--voucher-bg: #fff5f7;
+		--voucher-border: #692d3a;
+		--voucher-dashed: #efc7d0;
+		--voucher-ink: #692d3a;
+		--voucher-muted: #8a6170;
+		--voucher-soft: #a98792;
+		--voucher-warm: #d35b63;
+	}
+
+	.voucher-theme-terracotta.theme-mode-dark {
 		--voucher-accent: #e47c60;
 		--voucher-bg: #26352d;
 		--voucher-border: #d7c6aa;
@@ -153,6 +189,39 @@
 		--voucher-muted: #c9d2c8;
 		--voucher-soft: #aebbb2;
 		--voucher-warm: #d6b28f;
+	}
+
+	.voucher-theme-ocean.theme-mode-dark {
+		--voucher-accent: #69c5cc;
+		--voucher-bg: #173238;
+		--voucher-border: #b9d9d8;
+		--voucher-dashed: #507277;
+		--voucher-ink: #eefcfb;
+		--voucher-muted: #b7d0d0;
+		--voucher-soft: #91aaaa;
+		--voucher-warm: #e0ae87;
+	}
+
+	.voucher-theme-lavender.theme-mode-dark {
+		--voucher-accent: #c2a0ee;
+		--voucher-bg: #30263b;
+		--voucher-border: #e0d1f3;
+		--voucher-dashed: #68577b;
+		--voucher-ink: #fff8ff;
+		--voucher-muted: #d5c6de;
+		--voucher-soft: #b6a5c1;
+		--voucher-warm: #e9a9b9;
+	}
+
+	.voucher-theme-love.theme-mode-dark {
+		--voucher-accent: #ff8194;
+		--voucher-bg: #431f2a;
+		--voucher-border: #f4c5d0;
+		--voucher-dashed: #895364;
+		--voucher-ink: #fff5f7;
+		--voucher-muted: #e7c3cb;
+		--voucher-soft: #cba1ac;
+		--voucher-warm: #ff9a9e;
 	}
 
 	.voucher-ink {
@@ -180,7 +249,7 @@
 	}
 
 	@media (prefers-color-scheme: dark) {
-		.theme-system {
+		.voucher-theme-terracotta.theme-mode-system {
 			--voucher-accent: #e47c60;
 			--voucher-bg: #26352d;
 			--voucher-border: #d7c6aa;
@@ -189,6 +258,39 @@
 			--voucher-muted: #c9d2c8;
 			--voucher-soft: #aebbb2;
 			--voucher-warm: #d6b28f;
+		}
+
+		.voucher-theme-ocean.theme-mode-system {
+			--voucher-accent: #69c5cc;
+			--voucher-bg: #173238;
+			--voucher-border: #b9d9d8;
+			--voucher-dashed: #507277;
+			--voucher-ink: #eefcfb;
+			--voucher-muted: #b7d0d0;
+			--voucher-soft: #91aaaa;
+			--voucher-warm: #e0ae87;
+		}
+
+		.voucher-theme-lavender.theme-mode-system {
+			--voucher-accent: #c2a0ee;
+			--voucher-bg: #30263b;
+			--voucher-border: #e0d1f3;
+			--voucher-dashed: #68577b;
+			--voucher-ink: #fff8ff;
+			--voucher-muted: #d5c6de;
+			--voucher-soft: #b6a5c1;
+			--voucher-warm: #e9a9b9;
+		}
+
+		.voucher-theme-love.theme-mode-system {
+			--voucher-accent: #ff8194;
+			--voucher-bg: #431f2a;
+			--voucher-border: #f4c5d0;
+			--voucher-dashed: #895364;
+			--voucher-ink: #fff5f7;
+			--voucher-muted: #e7c3cb;
+			--voucher-soft: #cba1ac;
+			--voucher-warm: #ff9a9e;
 		}
 	}
 </style>
