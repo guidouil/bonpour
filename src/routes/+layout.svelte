@@ -1,15 +1,25 @@
 <script lang="ts">
 	import './layout.css';
-	import { resolve } from '$app/paths';
+	import { assets, resolve } from '$app/paths';
+	import { page } from '$app/state';
 	import favicon from '$lib/assets/favicon.svg';
 	import type { LayoutProps } from './$types';
 
 	let { children, data }: LayoutProps = $props();
+	let defaultOgImageUrl = $derived(new URL(`${assets}/og-default.png`, page.url.origin).href);
 </script>
 
 <svelte:head>
 	<link rel="icon" href={favicon} />
 	<meta name="description" content="Créez et partagez un joli Bon Pour en quelques secondes." />
+	{#if page.route.id !== '/b/[slug]'}
+		<meta property="og:image" content={defaultOgImageUrl} />
+		<meta property="og:image:width" content="1200" />
+		<meta property="og:image:height" content="630" />
+		<meta property="og:image:alt" content="BonPour · Un joli bon, tout simplement." />
+		<meta name="twitter:card" content="summary_large_image" />
+		<meta name="twitter:image" content={defaultOgImageUrl} />
+	{/if}
 </svelte:head>
 
 <header class="site-header border-b backdrop-blur">

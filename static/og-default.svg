@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+	<rect width="1200" height="630" fill="#f8f1e5" />
+	<circle cx="98" cy="66" r="190" fill="#fffaf0" />
+	<circle cx="1120" cy="576" r="250" fill="#f1e7d7" />
+	<rect x="48" y="42" width="1104" height="546" rx="28" fill="#fffaf0" stroke="#26352d" stroke-width="3" />
+	<rect x="72" y="66" width="1056" height="498" rx="20" fill="none" stroke="#d9cbb5" stroke-width="2" stroke-dasharray="8 12" />
+	<circle cx="1010" cy="158" r="78" fill="#cf684d" />
+	<circle cx="1010" cy="158" r="64" fill="none" stroke="#fffaf0" stroke-width="2" stroke-dasharray="4 8" />
+	<path fill="#fffaf0" d="M978 116h43c18 0 29 8 29 23 0 11-6 18-16 21 13 3 20 11 20 24 0 18-13 29-34 29h-42zm38 37c10 0 16-4 16-11 0-8-6-11-16-11h-20v22zm2 44c13 0 19-5 19-14 0-8-6-13-19-13h-22v27z" />
+	<text x="138" y="178" fill="#cf684d" font-family="Arial, sans-serif" font-size="28" font-weight="700" letter-spacing="8">BON POUR</text>
+	<text x="138" y="305" fill="#26352d" font-family="Georgia, serif" font-size="88" font-weight="700">Un joli bon,</text>
+	<text x="138" y="402" fill="#cf684d" font-family="Georgia, serif" font-size="88" font-style="italic" font-weight="700">tout simplement.</text>
+	<line x1="138" y1="478" x2="1062" y2="478" stroke="#d9cbb5" stroke-width="2" />
+	<text x="138" y="526" fill="#647168" font-family="Arial, sans-serif" font-size="24" letter-spacing="2">CRÉE · PARTAGE · FAIS PLAISIR</text>
+</svg>
