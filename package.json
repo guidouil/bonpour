@@ -57,6 +57,8 @@
 	},
 	"dependencies": {
 		"@resvg/resvg-js": "^2.6.2",
-		"@sveltejs/adapter-node": "^5.5.4"
+		"@sveltejs/adapter-node": "^5.5.4",
+		"@twemoji/parser": "^17.0.1",
+		"@twemoji/svg": "^15.0.0"
 	}
 }

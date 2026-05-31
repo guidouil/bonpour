@@ -1,4 +1,7 @@
+import { createRequire } from 'node:module';
+import { readFileSync } from 'node:fs';
 import { Resvg } from '@resvg/resvg-js';
+import { parse } from '@twemoji/parser';
 import type { VoucherTheme, VoucherThemeMode } from '$lib/voucher';
 
 type OgVoucher = {
@@ -93,6 +96,11 @@ const voucherColors = {
 	}
 } satisfies Record<VoucherTheme, Record<'light' | 'dark', Record<string, string>>>;
 
+const require = createRequire(import.meta.url);
+const emojiSvgCache = new Map<string, string | null>();
+
+export const voucherOgRendererVersion = 2;
+
 export function escapeXml(value: string) {
 	return value
 		.replaceAll('&', '&amp;')
@@ -100,6 +108,102 @@ export function escapeXml(value: string) {
 		.replaceAll('>', '&gt;')
 		.replaceAll('"', '&quot;')
 		.replaceAll("'", '&apos;');
+}
+
+function getEmojiDataUrl(url: string) {
+	const filename = url.split('/').at(-1);
+	if (!filename?.endsWith('.svg')) return null;
+
+	if (!emojiSvgCache.has(filename)) {
+		try {
+			const svg = readFileSync(require.resolve(`@twemoji/svg/${filename}`), 'utf8');
+			emojiSvgCache.set(
+				filename,
+				`data:image/svg+xml;base64,${Buffer.from(svg).toString('base64')}`
+			);
+		} catch {
+			emojiSvgCache.set(filename, null);
+		}
+	}
+
+	return emojiSvgCache.get(filename);
+}
+
+function estimateTextWidth(value: string, fontSize: number, letterSpacing = 0) {
+	return (
+		[...value].reduce((width, character) => {
+			if (character === ' ') return width + fontSize * 0.28;
+			if (/[ilI1.,'’]/.test(character)) return width + fontSize * 0.28;
+			if (/[mwMW@]/.test(character)) return width + fontSize * 0.85;
+			return width + fontSize * 0.56;
+		}, 0) +
+		Math.max(0, [...value].length - 1) * letterSpacing
+	);
+}
+
+function renderText({
+	value,
+	x,
+	y,
+	fontFamily,
+	fontSize,
+	fill,
+	fontWeight,
+	letterSpacing = 0,
+	textAnchor = 'start'
+}: {
+	value: string;
+	x: number;
+	y: number;
+	fontFamily: string;
+	fontSize: number;
+	fill: string;
+	fontWeight?: number;
+	letterSpacing?: number;
+	textAnchor?: 'start' | 'middle';
+}) {
+	const entities = parse(value);
+	if (!entities.length) {
+		return `<text x="${x}" y="${y}" text-anchor="${textAnchor}" font-family="${fontFamily}" font-size="${fontSize}"${fontWeight ? ` font-weight="${fontWeight}"` : ''}${letterSpacing ? ` letter-spacing="${letterSpacing}"` : ''} fill="${fill}">${escapeXml(value)}</text>`;
+	}
+
+	const tokens: { content: string; emojiDataUrl?: string; width: number }[] = [];
+	let cursor = 0;
+
+	for (const entity of entities) {
+		const before = value.slice(cursor, entity.indices[0]);
+		if (before)
+			tokens.push({ content: before, width: estimateTextWidth(before, fontSize, letterSpacing) });
+
+		const emojiDataUrl = getEmojiDataUrl(entity.url);
+		if (emojiDataUrl) {
+			tokens.push({ content: entity.text, emojiDataUrl, width: fontSize * 1.1 });
+		} else {
+			tokens.push({
+				content: entity.text,
+				width: estimateTextWidth(entity.text, fontSize, letterSpacing)
+			});
+		}
+		cursor = entity.indices[1];
+	}
+
+	const after = value.slice(cursor);
+	if (after)
+		tokens.push({ content: after, width: estimateTextWidth(after, fontSize, letterSpacing) });
+
+	const totalWidth = tokens.reduce((width, token) => width + token.width, 0);
+	let currentX = textAnchor === 'middle' ? x - totalWidth / 2 : x;
+
+	return tokens
+		.map((token) => {
+			const tokenX = currentX;
+			currentX += token.width;
+			if (token.emojiDataUrl) {
+				return `<image x="${tokenX + fontSize * 0.05}" y="${y - fontSize * 0.82}" width="${fontSize}" height="${fontSize}" href="${token.emojiDataUrl}"/>`;
+			}
+			return `<text x="${tokenX}" y="${y}" font-family="${fontFamily}" font-size="${fontSize}"${fontWeight ? ` font-weight="${fontWeight}"` : ''}${letterSpacing ? ` letter-spacing="${letterSpacing}"` : ''} fill="${fill}">${escapeXml(token.content)}</text>`;
+		})
+		.join('');
 }
 
 function wrapText(value: string, maxCharacters = 27) {
@@ -125,13 +229,30 @@ export function renderVoucherSvg(voucher: OgVoucher) {
 	const colors = voucherColors[voucher.theme][dark ? 'dark' : 'light'];
 	const subjectLines = wrapText(voucher.subject);
 	const subject = subjectLines
-		.map(
-			(line, index) =>
-				`<text x="600" y="${286 + index * 76}" text-anchor="middle" font-family="Georgia, serif" font-size="62" font-weight="700" fill="${colors.ink}">${escapeXml(line)}</text>`
+		.map((line, index) =>
+			renderText({
+				value: line,
+				x: 600,
+				y: 286 + index * 76,
+				textAnchor: 'middle',
+				fontFamily: 'Georgia, serif',
+				fontSize: 62,
+				fontWeight: 700,
+				fill: colors.ink
+			})
 		)
 		.join('');
 	const quantity = voucher.quantity
-		? `<text x="1040" y="112" text-anchor="middle" font-family="Arial, sans-serif" font-size="25" font-weight="700" fill="${colors.card}">× ${voucher.quantity}</text>`
+		? renderText({
+				value: `× ${voucher.quantity}`,
+				x: 1040,
+				y: 112,
+				textAnchor: 'middle',
+				fontFamily: 'Arial, sans-serif',
+				fontSize: 25,
+				fontWeight: 700,
+				fill: colors.card
+			})
 		: '';
 
 	return `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
@@ -141,11 +262,11 @@ export function renderVoucherSvg(voucher: OgVoucher) {
 	<circle cx="1040" cy="112" r="61" fill="${colors.accent}"/>
 	<circle cx="1040" cy="112" r="49" fill="none" stroke="${colors.card}" stroke-width="2" stroke-dasharray="3 7"/>
 	${quantity}
-	<text x="110" y="132" font-family="Arial, sans-serif" font-size="24" font-weight="700" letter-spacing="7" fill="${colors.accent}">BON POUR</text>
-	<text x="600" y="208" text-anchor="middle" font-family="Arial, sans-serif" font-size="27" letter-spacing="3" fill="${colors.muted}">POUR ${escapeXml(voucher.recipientName.toUpperCase())}</text>
+	${renderText({ value: 'BON POUR', x: 110, y: 132, fontFamily: 'Arial, sans-serif', fontSize: 24, fontWeight: 700, letterSpacing: 7, fill: colors.accent })}
+	${renderText({ value: `POUR ${voucher.recipientName.toUpperCase()}`, x: 600, y: 208, textAnchor: 'middle', fontFamily: 'Arial, sans-serif', fontSize: 27, letterSpacing: 3, fill: colors.muted })}
 	${subject}
 	<line x1="160" y1="510" x2="1040" y2="510" stroke="${colors.dashed}" stroke-width="2"/>
-	<text x="600" y="552" text-anchor="middle" font-family="Arial, sans-serif" font-size="24" letter-spacing="2" fill="${colors.muted}">OFFERT PAR ${escapeXml(voucher.senderName.toUpperCase())}</text>
+	${renderText({ value: `OFFERT PAR ${voucher.senderName.toUpperCase()}`, x: 600, y: 552, textAnchor: 'middle', fontFamily: 'Arial, sans-serif', fontSize: 24, letterSpacing: 2, fill: colors.muted })}
 </svg>`;
 }
 

@@ -1,7 +1,7 @@
 import { and, asc, desc, eq, isNull, or } from 'drizzle-orm';
 import { db } from '$lib/server/db';
 import { voucher, voucherEvent, voucherOgImage } from '$lib/server/db/schema';
-import { renderVoucherPng } from '$lib/server/voucher-og';
+import { renderVoucherPng, voucherOgRendererVersion } from '$lib/server/voucher-og';
 import { canTransition, getDisplayStatus, type VoucherStatus } from '$lib/voucher';
 import type { VoucherInput } from './voucher-validation';
 import { createManagementToken, createPublicSlug, hashManagementToken } from './voucher-secrets';
@@ -19,7 +19,9 @@ export async function createVoucher(input: VoucherInput, ownerId?: string) {
 			.insert(voucher)
 			.values({ ...input, publicSlug, managementTokenHash, ownerId })
 			.returning();
-		await tx.insert(voucherOgImage).values({ voucherId: record.id, png: ogImage });
+		await tx
+			.insert(voucherOgImage)
+			.values({ voucherId: record.id, png: ogImage, rendererVersion: voucherOgRendererVersion });
 		await tx.insert(voucherEvent).values({
 			voucherId: record.id,
 			type: 'created',
@@ -39,22 +41,25 @@ export async function getVoucherBySlug(publicSlug: string) {
 
 export async function getVoucherOgImageBySlug(publicSlug: string) {
 	const [storedImage] = await db
-		.select({ png: voucherOgImage.png })
+		.select({ png: voucherOgImage.png, rendererVersion: voucherOgImage.rendererVersion })
 		.from(voucherOgImage)
 		.innerJoin(voucher, eq(voucherOgImage.voucherId, voucher.id))
 		.where(eq(voucher.publicSlug, publicSlug))
 		.limit(1);
-	if (storedImage) return storedImage.png;
+	if (storedImage?.rendererVersion === voucherOgRendererVersion) return storedImage.png;
 
-	// Existing vouchers created before PNG persistence are backfilled on first access.
+	// Missing and stale PNGs are backfilled on first access.
 	const existingVoucher = await getVoucherBySlug(publicSlug);
 	if (!existingVoucher) return null;
 
 	const png = renderVoucherPng(existingVoucher);
 	await db
 		.insert(voucherOgImage)
-		.values({ voucherId: existingVoucher.id, png })
-		.onConflictDoNothing();
+		.values({ voucherId: existingVoucher.id, png, rendererVersion: voucherOgRendererVersion })
+		.onConflictDoUpdate({
+			target: voucherOgImage.voucherId,
+			set: { png, rendererVersion: voucherOgRendererVersion }
+		});
 	return png;
 }
 

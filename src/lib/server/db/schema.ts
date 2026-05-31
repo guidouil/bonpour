@@ -40,7 +40,8 @@ export const voucherOgImage = pgTable('voucher_og_image', {
 	voucherId: uuid('voucher_id')
 		.primaryKey()
 		.references(() => voucher.id, { onDelete: 'cascade' }),
-	png: bytea('png').notNull()
+	png: bytea('png').notNull(),
+	rendererVersion: integer('renderer_version').notNull().default(2)
 });
 
 export const voucherEvent = pgTable(

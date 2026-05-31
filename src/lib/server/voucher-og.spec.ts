@@ -23,6 +23,18 @@ describe('voucher Open Graph rendering', () => {
 		expect(Array.from(png.subarray(0, 8))).toEqual([137, 80, 78, 71, 13, 10, 26, 10]);
 	});
 
+	it('embeds emoji as local SVG images', () => {
+		const svg = renderVoucherSvg({
+			...voucher,
+			senderName: 'Camille ❤️',
+			recipientName: 'Alex 🥐',
+			subject: 'un brunch 🥐'
+		});
+		expect(svg).toContain('<image');
+		expect(svg).toContain('href="data:image/svg+xml;base64,');
+		expect(renderVoucherPng({ ...voucher, subject: 'un brunch 🥐' })).toBeInstanceOf(Uint8Array);
+	});
+
 	it('renders explicit dark vouchers with the dark palette', () => {
 		const svg = renderVoucherSvg({ ...voucher, themeMode: 'dark' });
 		expect(svg).toContain('#17231f');

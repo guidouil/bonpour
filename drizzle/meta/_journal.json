@@ -36,6 +36,13 @@
       "when": 1780242321505,
       "tag": "0004_replace-honey-with-love",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1780243672026,
+      "tag": "0005_vengeful_excalibur",
+      "breakpoints": true
     }
   ]
 }
