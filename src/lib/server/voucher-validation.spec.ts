@@ -10,6 +10,7 @@ function validForm() {
 		['quantity', '2'],
 		['message', 'Avec plaisir'],
 		['theme', 'ocean'],
+		['font', 'modern'],
 		['themeMode', 'dark'],
 		['hasExpiration', 'on'],
 		['expirationDate', '2026-06-30']
@@ -25,6 +26,7 @@ describe('voucher form validation', () => {
 			senderName: 'Camille',
 			quantity: 2,
 			theme: 'ocean',
+			font: 'modern',
 			themeMode: 'dark'
 		});
 	});
@@ -47,6 +49,7 @@ describe('voucher form validation', () => {
 	it('defaults to the system theme and rejects unknown modes', () => {
 		const form = validForm();
 		form.delete('theme');
+		form.delete('font');
 		form.delete('themeMode');
 		expect(parseVoucherForm(form, new Date('2026-05-31T12:00:00Z')).input?.theme).toBe(
 			'terracotta'
@@ -54,6 +57,7 @@ describe('voucher form validation', () => {
 		expect(parseVoucherForm(form, new Date('2026-05-31T12:00:00Z')).input?.themeMode).toBe(
 			'system'
 		);
+		expect(parseVoucherForm(form, new Date('2026-05-31T12:00:00Z')).input?.font).toBe('classic');
 
 		form.set('theme', 'sepia');
 		expect(parseVoucherForm(form, new Date('2026-05-31T12:00:00Z')).errors).toMatchObject({
@@ -61,6 +65,12 @@ describe('voucher form validation', () => {
 		});
 
 		form.set('theme', 'terracotta');
+		form.set('font', 'display');
+		expect(parseVoucherForm(form, new Date('2026-05-31T12:00:00Z')).errors).toMatchObject({
+			font: expect.any(String)
+		});
+
+		form.set('font', 'classic');
 		form.set('themeMode', 'sepia');
 		expect(parseVoucherForm(form, new Date('2026-05-31T12:00:00Z')).errors).toMatchObject({
 			themeMode: expect.any(String)

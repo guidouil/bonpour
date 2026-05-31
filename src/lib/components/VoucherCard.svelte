@@ -2,6 +2,7 @@
 	import {
 		getDisplayStatus,
 		statusLabels,
+		type VoucherFont,
 		type VoucherStatus,
 		type VoucherTheme,
 		type VoucherThemeMode
@@ -16,6 +17,7 @@
 		expiresAt = null,
 		status = 'created',
 		theme = 'terracotta',
+		font = 'classic',
 		themeMode = 'system',
 		preview = false
 	}: {
@@ -27,6 +29,7 @@
 		expiresAt?: Date | string | null;
 		status?: VoucherStatus;
 		theme?: VoucherTheme;
+		font?: VoucherFont;
 		themeMode?: VoucherThemeMode;
 		preview?: boolean;
 	} = $props();
@@ -41,7 +44,7 @@
 	);
 </script>
 
-<article class={`voucher-card voucher-theme-${theme} theme-mode-${themeMode}`}>
+<article class={`voucher-card voucher-theme-${theme} voucher-font-${font} theme-mode-${themeMode}`}>
 	<div class="voucher-inner">
 		<div class="flex items-start justify-between gap-3">
 			<div>
@@ -60,7 +63,9 @@
 		</div>
 
 		<div class="flex min-h-36 items-center justify-center px-3 py-5 text-center sm:min-h-44">
-			<h2 class="voucher-ink font-serif text-3xl leading-[1.08] font-semibold sm:text-4xl">
+			<h2
+				class="voucher-feature voucher-title voucher-ink text-3xl leading-[1.08] font-semibold sm:text-4xl"
+			>
 				{subject || 'un moment qui compte'}
 			</h2>
 		</div>
@@ -74,7 +79,7 @@
 		<footer class="voucher-rule mt-5 flex items-end justify-between gap-4 border-t pt-4">
 			<div>
 				<p class="voucher-warm text-[0.59rem] font-bold tracking-[0.19em] uppercase">Offert par</p>
-				<p class="voucher-ink mt-1 font-serif text-lg font-semibold">
+				<p class="voucher-feature voucher-creator voucher-ink mt-1 text-lg font-semibold">
 					{senderName || 'une personne attentionnée'}
 				</p>
 			</div>
@@ -114,6 +119,28 @@
 			0 18px 50px rgb(57 69 59 / 12%),
 			0 2px 0 rgb(255 255 255 / 55%) inset;
 		padding: 0.82rem;
+	}
+
+	.voucher-feature {
+		font-family: Georgia, 'Times New Roman', serif;
+	}
+
+	.voucher-font-script .voucher-feature {
+		font-family: 'Brush Script MT', 'Segoe Script', cursive;
+		font-weight: 400;
+	}
+
+	.voucher-font-script .voucher-title {
+		font-size: 2.35rem;
+	}
+
+	.voucher-font-script .voucher-creator {
+		font-size: 1.3rem;
+	}
+
+	.voucher-font-modern .voucher-feature {
+		font-family: Arial, Helvetica, sans-serif;
+		letter-spacing: 0.01em;
 	}
 
 	.voucher-inner {
@@ -246,6 +273,12 @@
 
 	.voucher-rule {
 		border-color: var(--voucher-dashed);
+	}
+
+	@media (min-width: 40rem) {
+		.voucher-font-script .voucher-title {
+			font-size: 2.75rem;
+		}
 	}
 
 	@media (prefers-color-scheme: dark) {

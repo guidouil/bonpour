@@ -2,8 +2,11 @@
 	import { enhance } from '$app/forms';
 	import VoucherCard from '$lib/components/VoucherCard.svelte';
 	import {
+		voucherFontLabels,
+		voucherFonts,
 		voucherThemeLabels,
 		voucherThemes,
+		type VoucherFont,
 		type VoucherTheme,
 		type VoucherThemeMode
 	} from '$lib/voucher';
@@ -21,6 +24,12 @@
 		untrack(() => {
 			const initialTheme = form?.values?.theme as VoucherTheme;
 			return voucherThemes.includes(initialTheme) ? initialTheme : 'terracotta';
+		})
+	);
+	let font = $state<VoucherFont>(
+		untrack(() => {
+			const initialFont = form?.values?.font as VoucherFont;
+			return voucherFonts.includes(initialFont) ? initialFont : 'classic';
 		})
 	);
 	let themeMode = $state<VoucherThemeMode>(
@@ -154,6 +163,27 @@
 			</fieldset>
 
 			<fieldset>
+				<legend class="field-label">Police</legend>
+				<div class="grid grid-cols-3 gap-2">
+					{#each voucherFonts as voucherFont (voucherFont)}
+						<label
+							class={`theme-choice font-choice font-choice-${voucherFont} cursor-pointer rounded-xl border px-3 py-3 text-center text-sm font-bold`}
+						>
+							<input
+								class="sr-only"
+								type="radio"
+								name="font"
+								value={voucherFont}
+								bind:group={font}
+							/>
+							{voucherFontLabels[voucherFont]}
+						</label>
+					{/each}
+				</div>
+				{#if form?.errors?.font}<span class="error-text">{form.errors.font}</span>{/if}
+			</fieldset>
+
+			<fieldset>
 				<legend class="field-label">Apparence</legend>
 				<div class="grid grid-cols-3 gap-2">
 					{#each [{ value: 'system', label: 'Système' }, { value: 'light', label: 'Clair' }, { value: 'dark', label: 'Sombre' }] as mode (mode.value)}
@@ -215,6 +245,7 @@
 				quantity={quantity ? Number(quantity) : null}
 				{message}
 				{theme}
+				{font}
 				{themeMode}
 				expiresAt={hasExpiration ? expirationDate : null}
 				preview
@@ -222,3 +253,20 @@
 		</div>
 	</div>
 </main>
+
+<style>
+	.font-choice-classic {
+		font-family: Georgia, 'Times New Roman', serif;
+	}
+
+	.font-choice-script {
+		font-family: 'Brush Script MT', 'Segoe Script', cursive;
+		font-size: 1.15rem;
+		font-weight: 400;
+	}
+
+	.font-choice-modern {
+		font-family: Arial, Helvetica, sans-serif;
+		letter-spacing: 0.04em;
+	}
+</style>

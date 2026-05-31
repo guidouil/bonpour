@@ -1,6 +1,8 @@
 import {
+	voucherFonts,
 	voucherThemeModes,
 	voucherThemes,
+	type VoucherFont,
 	type VoucherTheme,
 	type VoucherThemeMode
 } from '$lib/voucher';
@@ -12,6 +14,7 @@ export type VoucherInput = {
 	quantity: number | null;
 	message: string | null;
 	theme: VoucherTheme;
+	font: VoucherFont;
 	themeMode: VoucherThemeMode;
 	expiresAt: Date | null;
 };
@@ -24,6 +27,7 @@ export type VoucherFormValues = Record<
 	| 'message'
 	| 'expirationDate'
 	| 'theme'
+	| 'font'
 	| 'themeMode',
 	string
 > & { hasExpiration: boolean };
@@ -49,6 +53,7 @@ export function parseVoucherForm(formData: FormData, now = new Date()) {
 		message: field(formData, 'message'),
 		expirationDate: field(formData, 'expirationDate'),
 		theme: field(formData, 'theme') || 'terracotta',
+		font: field(formData, 'font') || 'classic',
 		themeMode: field(formData, 'themeMode') || 'system',
 		hasExpiration: formData.get('hasExpiration') === 'on'
 	};
@@ -68,6 +73,9 @@ export function parseVoucherForm(formData: FormData, now = new Date()) {
 	}
 	if (!voucherThemes.includes(values.theme as VoucherTheme)) {
 		errors.theme = 'Choisis un thème de couleurs valide.';
+	}
+	if (!voucherFonts.includes(values.font as VoucherFont)) {
+		errors.font = 'Choisis une police valide.';
 	}
 	if (!voucherThemeModes.includes(values.themeMode as VoucherThemeMode)) {
 		errors.themeMode = 'Choisis un style de bon valide.';
@@ -100,6 +108,7 @@ export function parseVoucherForm(formData: FormData, now = new Date()) {
 			quantity,
 			message: values.message || null,
 			theme: values.theme as VoucherTheme,
+			font: values.font as VoucherFont,
 			themeMode: values.themeMode as VoucherThemeMode,
 			expiresAt
 		} satisfies VoucherInput

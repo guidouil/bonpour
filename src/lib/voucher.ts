@@ -20,6 +20,13 @@ export const voucherThemeLabels: Record<VoucherTheme, string> = {
 };
 export const voucherThemeModes = ['system', 'light', 'dark'] as const;
 export type VoucherThemeMode = (typeof voucherThemeModes)[number];
+export const voucherFonts = ['classic', 'script', 'modern'] as const;
+export type VoucherFont = (typeof voucherFonts)[number];
+export const voucherFontLabels: Record<VoucherFont, string> = {
+	classic: 'Classique',
+	script: 'Script',
+	modern: 'Moderne'
+};
 
 export type VoucherView = {
 	senderName: string;
@@ -29,6 +36,7 @@ export type VoucherView = {
 	message: string | null;
 	status: VoucherStatus;
 	expiresAt: Date | string | null;
+	font: VoucherFont;
 };
 
 const terminalStatuses: VoucherStatus[] = ['declined', 'redeemed', 'cancelled'];

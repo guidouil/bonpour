@@ -7,6 +7,7 @@ const voucher = {
 	subject: 'un brunch & une surprise',
 	quantity: 2,
 	theme: 'terracotta' as const,
+	font: 'classic' as const,
 	themeMode: 'system' as const
 };
 
@@ -54,6 +55,11 @@ describe('voucher Open Graph rendering', () => {
 		expect(svg).toContain('#f2fbfa');
 		expect(svg).toContain('#2f7f88');
 		expect(svg).not.toContain('#cf684d');
+	});
+
+	it('renders the selected font', () => {
+		const svg = renderVoucherSvg({ ...voucher, font: 'modern' });
+		expect(svg).toContain('font-family="Arial, sans-serif" font-size="62"');
 	});
 
 	it('renders the love theme with its dark palette', () => {

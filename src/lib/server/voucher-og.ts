@@ -2,7 +2,7 @@ import { createRequire } from 'node:module';
 import { readFileSync } from 'node:fs';
 import { Resvg } from '@resvg/resvg-js';
 import { parse } from '@twemoji/parser';
-import type { VoucherTheme, VoucherThemeMode } from '$lib/voucher';
+import type { VoucherFont, VoucherTheme, VoucherThemeMode } from '$lib/voucher';
 
 type OgVoucher = {
 	senderName: string;
@@ -10,7 +10,14 @@ type OgVoucher = {
 	subject: string;
 	quantity: number | null;
 	theme: VoucherTheme;
+	font: VoucherFont;
 	themeMode: VoucherThemeMode;
+};
+
+const voucherFontFamilies: Record<VoucherFont, string> = {
+	classic: 'Georgia, serif',
+	script: 'Brush Script MT, Segoe Script, cursive',
+	modern: 'Arial, sans-serif'
 };
 
 const voucherColors = {
@@ -99,7 +106,7 @@ const voucherColors = {
 const require = createRequire(import.meta.url);
 const emojiSvgCache = new Map<string, string | null>();
 
-export const voucherOgRendererVersion = 3;
+export const voucherOgRendererVersion = 4;
 
 export function escapeXml(value: string) {
 	return value
@@ -227,6 +234,7 @@ function wrapText(value: string, maxCharacters = 27) {
 export function renderVoucherSvg(voucher: OgVoucher) {
 	const dark = voucher.themeMode === 'dark';
 	const colors = voucherColors[voucher.theme][dark ? 'dark' : 'light'];
+	const featureFontFamily = voucherFontFamilies[voucher.font];
 	const subjectLines = wrapText(voucher.subject);
 	const subject = subjectLines
 		.map((line, index) =>
@@ -235,7 +243,7 @@ export function renderVoucherSvg(voucher: OgVoucher) {
 				x: 600,
 				y: 286 + index * 76,
 				textAnchor: 'middle',
-				fontFamily: 'Georgia, serif',
+				fontFamily: featureFontFamily,
 				fontSize: 62,
 				fontWeight: 700,
 				fill: colors.ink

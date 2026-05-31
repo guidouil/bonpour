@@ -21,6 +21,9 @@ export const voucher = pgTable(
 		theme: text('theme', { enum: ['terracotta', 'ocean', 'lavender', 'love'] })
 			.notNull()
 			.default('terracotta'),
+		font: text('font', { enum: ['classic', 'script', 'modern'] })
+			.notNull()
+			.default('classic'),
 		themeMode: text('theme_mode', { enum: ['system', 'light', 'dark'] })
 			.notNull()
 			.default('system'),
@@ -41,7 +44,7 @@ export const voucherOgImage = pgTable('voucher_og_image', {
 		.primaryKey()
 		.references(() => voucher.id, { onDelete: 'cascade' }),
 	png: bytea('png').notNull(),
-	rendererVersion: integer('renderer_version').notNull().default(3)
+	rendererVersion: integer('renderer_version').notNull().default(4)
 });
 
 export const voucherEvent = pgTable(
