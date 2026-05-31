@@ -30,6 +30,9 @@
 		<nav class="flex items-center gap-4 text-xs font-bold tracking-[0.12em] site-muted uppercase">
 			{#if data.user}
 				<a class="hover-site-accent transition" href={resolve('/mes-bons')}>Mes bons</a>
+				{#if data.isAdmin}
+					<a class="hover-site-accent transition" href={resolve('/admin')}>Statistiques</a>
+				{/if}
 				<form action="/connexion?/signOut" method="post">
 					<button class="hover-site-accent transition" type="submit">Quitter</button>
 				</form>
