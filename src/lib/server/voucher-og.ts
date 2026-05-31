@@ -99,7 +99,7 @@ const voucherColors = {
 const require = createRequire(import.meta.url);
 const emojiSvgCache = new Map<string, string | null>();
 
-export const voucherOgRendererVersion = 2;
+export const voucherOgRendererVersion = 3;
 
 export function escapeXml(value: string) {
 	return value
@@ -116,7 +116,7 @@ function getEmojiDataUrl(url: string) {
 
 	if (!emojiSvgCache.has(filename)) {
 		try {
-			const svg = readFileSync(require.resolve(`@twemoji/svg/${filename}`), 'utf8');
+			const svg = readFileSync(require.resolve(`@discordapp/twemoji/dist/svg/${filename}`), 'utf8');
 			emojiSvgCache.set(
 				filename,
 				`data:image/svg+xml;base64,${Buffer.from(svg).toString('base64')}`

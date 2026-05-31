@@ -27,12 +27,19 @@ describe('voucher Open Graph rendering', () => {
 		const svg = renderVoucherSvg({
 			...voucher,
 			senderName: 'Camille ❤️',
-			recipientName: 'Alex 🥐',
-			subject: 'un brunch 🥐'
+			recipientName: 'Alex 😱',
+			subject: 'Déjà🍾🥂🤪 et aussi 🍌'
 		});
-		expect(svg).toContain('<image');
-		expect(svg).toContain('href="data:image/svg+xml;base64,');
-		expect(renderVoucherPng({ ...voucher, subject: 'un brunch 🥐' })).toBeInstanceOf(Uint8Array);
+		expect(svg.match(/<image/g)).toHaveLength(6);
+		expect(svg.match(/href="data:image\/svg\+xml;base64,/g)).toHaveLength(6);
+		expect(renderVoucherPng({ ...voucher, subject: 'Déjà🍾🥂🤪 et aussi 🍌' })).toBeInstanceOf(
+			Uint8Array
+		);
+	});
+
+	it('embeds recently added emoji as local SVG images', () => {
+		const svg = renderVoucherSvg({ ...voucher, subject: 'un bon pour 🫩🫜🪾' });
+		expect(svg.match(/<image/g)).toHaveLength(3);
 	});
 
 	it('renders explicit dark vouchers with the dark palette', () => {

@@ -56,9 +56,9 @@
 		"vitest-browser-svelte": "^2.1.1"
 	},
 	"dependencies": {
+		"@discordapp/twemoji": "^16.0.1",
 		"@resvg/resvg-js": "^2.6.2",
 		"@sveltejs/adapter-node": "^5.5.4",
-		"@twemoji/parser": "^17.0.1",
-		"@twemoji/svg": "^15.0.0"
+		"@twemoji/parser": "^17.0.1"
 	}
 }
