@@ -57,6 +57,19 @@ test('selects a Material Symbol and replaces the quantity stamp in the preview',
 	await expect(page.locator('input[name="icon"]')).toHaveValue('local_cafe');
 	await expect(page.locator('.stamp svg')).toBeVisible();
 	await expect(page.locator('.stamp')).not.toContainText('× 2');
+
+	await page.setViewportSize({ width: 390, height: 844 });
+	await expect(page.locator('.stamp svg')).toBeVisible();
+	await expect(page.locator('.stamp svg')).toHaveCSS(
+		'color',
+		await page.locator('.stamp').evaluate((stamp) => getComputedStyle(stamp).borderColor)
+	);
+	const stampSize = await page.locator('.stamp').evaluate((stamp) => {
+		const style = getComputedStyle(stamp);
+		return { width: Number.parseFloat(style.width), height: Number.parseFloat(style.height) };
+	});
+	expect(stampSize.width).toBeGreaterThan(50);
+	expect(stampSize.height).toBe(stampSize.width);
 });
 
 test('creates, shares, accepts and redeems an anonymous voucher', async ({ page, request }) => {

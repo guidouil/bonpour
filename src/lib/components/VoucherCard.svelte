@@ -174,6 +174,7 @@
 		display: flex;
 		font-size: 1rem;
 		font-weight: 800;
+		flex: 0 0 3.2rem;
 		height: 3.2rem;
 		justify-content: center;
 		letter-spacing: 0.08em;
@@ -181,7 +182,8 @@
 		width: 3.2rem;
 	}
 
-	.stamp-icon {
+	.stamp :global(.stamp-icon) {
+		color: var(--voucher-bg);
 		height: 1.7rem;
 		width: 1.7rem;
 	}
