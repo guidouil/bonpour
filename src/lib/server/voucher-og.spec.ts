@@ -6,6 +6,7 @@ const voucher = {
 	recipientName: 'Alex',
 	subject: 'un brunch & une surprise',
 	quantity: 2,
+	icon: null,
 	theme: 'terracotta' as const,
 	font: 'classic' as const,
 	themeMode: 'system' as const
@@ -55,6 +56,12 @@ describe('voucher Open Graph rendering', () => {
 		expect(svg).toContain('#f2fbfa');
 		expect(svg).toContain('#2f7f88');
 		expect(svg).not.toContain('#cf684d');
+	});
+
+	it('renders a selected Material Symbol instead of the quantity', () => {
+		const svg = renderVoucherSvg({ ...voucher, icon: 'local_cafe' });
+		expect(svg).toContain('transform="translate(1008 144) scale(.067)"');
+		expect(svg).not.toContain('× 2');
 	});
 
 	it('renders the selected font', () => {

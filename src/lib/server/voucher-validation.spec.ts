@@ -8,6 +8,7 @@ function validForm() {
 		['recipientName', 'Alex'],
 		['subject', 'un brunch maison'],
 		['quantity', '2'],
+		['icon', 'local_cafe'],
 		['message', 'Avec plaisir'],
 		['theme', 'ocean'],
 		['font', 'modern'],
@@ -25,9 +26,18 @@ describe('voucher form validation', () => {
 		expect(result.input).toMatchObject({
 			senderName: 'Camille',
 			quantity: 2,
+			icon: 'local_cafe',
 			theme: 'ocean',
 			font: 'modern',
 			themeMode: 'dark'
+		});
+	});
+
+	it('rejects unknown icons', () => {
+		const form = validForm();
+		form.set('icon', 'not-a-real-symbol');
+		expect(parseVoucherForm(form, new Date('2026-05-31T12:00:00Z')).errors).toMatchObject({
+			icon: expect.any(String)
 		});
 	});
 

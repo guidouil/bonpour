@@ -18,7 +18,6 @@
 	<meta name="robots" content="noindex,nofollow" />
 	<meta property="og:title" content="Un Bon Pour pour {data.voucher.recipientName}" />
 	<meta property="og:description" content="{data.voucher.senderName} a pensé à toi." />
-	<meta property="og:type" content="website" />
 	<meta property="og:image" content={data.ogImageUrl} />
 	<meta name="twitter:card" content="summary_large_image" />
 </svelte:head>

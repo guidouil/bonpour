@@ -1,6 +1,8 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
+	import MaterialSymbolPicker from '$lib/components/MaterialSymbolPicker.svelte';
 	import VoucherCard from '$lib/components/VoucherCard.svelte';
+	import { isMaterialSymbolName, type MaterialSymbolName } from '$lib/material-symbols';
 	import {
 		voucherFontLabels,
 		voucherFonts,
@@ -19,6 +21,12 @@
 	let recipientName = $state(untrack(() => form?.values?.recipientName ?? ''));
 	let subject = $state(untrack(() => form?.values?.subject ?? ''));
 	let quantity = $state(untrack(() => form?.values?.quantity ?? ''));
+	let icon = $state<MaterialSymbolName | ''>(
+		untrack(() => {
+			const initialIcon = form?.values?.icon ?? '';
+			return isMaterialSymbolName(initialIcon) ? initialIcon : '';
+		})
+	);
 	let message = $state(untrack(() => form?.values?.message ?? ''));
 	let theme = $state<VoucherTheme>(
 		untrack(() => {
@@ -109,11 +117,12 @@
 				{#if form?.errors?.subject}<span class="error-text">{form.errors.subject}</span>{/if}
 			</label>
 
-			<div class="grid gap-5 mt-4 sm:grid-cols-[8rem_1fr]">
-				<label>
-					<span class="field-label">Quantité</span>
+			<div class="mt-4 grid gap-5 sm:grid-cols-[minmax(16rem,0.9fr)_1fr]">
+				<div>
+					<label class="field-label" for="quantity">Quantité</label>
 					<input
 						class="field"
+						id="quantity"
 						type="number"
 						name="quantity"
 						placeholder="1"
@@ -122,7 +131,9 @@
 						bind:value={quantity}
 					/>
 					{#if form?.errors?.quantity}<span class="error-text">{form.errors.quantity}</span>{/if}
-				</label>
+					<MaterialSymbolPicker bind:value={icon} />
+					{#if form?.errors?.icon}<span class="error-text">{form.errors.icon}</span>{/if}
+				</div>
 				<label>
 					<span class="field-label">Petit mot <span class="normal-case">(facultatif)</span></span>
 					<textarea
@@ -243,6 +254,7 @@
 				{recipientName}
 				{subject}
 				quantity={quantity ? Number(quantity) : null}
+				{icon}
 				{message}
 				{theme}
 				{font}

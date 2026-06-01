@@ -33,6 +33,7 @@ export type VoucherView = {
 	recipientName: string;
 	subject: string;
 	quantity: number | null;
+	icon: string | null;
 	message: string | null;
 	status: VoucherStatus;
 	expiresAt: Date | string | null;

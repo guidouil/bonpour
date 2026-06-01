@@ -6,12 +6,14 @@ import {
 	type VoucherTheme,
 	type VoucherThemeMode
 } from '$lib/voucher';
+import { isMaterialSymbolName, type MaterialSymbolName } from '$lib/material-symbols';
 
 export type VoucherInput = {
 	senderName: string;
 	recipientName: string;
 	subject: string;
 	quantity: number | null;
+	icon: MaterialSymbolName | null;
 	message: string | null;
 	theme: VoucherTheme;
 	font: VoucherFont;
@@ -24,6 +26,7 @@ export type VoucherFormValues = Record<
 	| 'recipientName'
 	| 'subject'
 	| 'quantity'
+	| 'icon'
 	| 'message'
 	| 'expirationDate'
 	| 'theme'
@@ -50,6 +53,7 @@ export function parseVoucherForm(formData: FormData, now = new Date()) {
 		recipientName: field(formData, 'recipientName'),
 		subject: field(formData, 'subject'),
 		quantity: field(formData, 'quantity'),
+		icon: field(formData, 'icon'),
 		message: field(formData, 'message'),
 		expirationDate: field(formData, 'expirationDate'),
 		theme: field(formData, 'theme') || 'terracotta',
@@ -80,6 +84,9 @@ export function parseVoucherForm(formData: FormData, now = new Date()) {
 	if (!voucherThemeModes.includes(values.themeMode as VoucherThemeMode)) {
 		errors.themeMode = 'Choisis un style de bon valide.';
 	}
+	if (values.icon && !isMaterialSymbolName(values.icon)) {
+		errors.icon = 'Choisis une icône valide.';
+	}
 
 	let quantity: number | null = null;
 	if (values.quantity) {
@@ -106,6 +113,7 @@ export function parseVoucherForm(formData: FormData, now = new Date()) {
 			recipientName: values.recipientName,
 			subject: values.subject,
 			quantity,
+			icon: values.icon ? (values.icon as MaterialSymbolName) : null,
 			message: values.message || null,
 			theme: values.theme as VoucherTheme,
 			font: values.font as VoucherFont,

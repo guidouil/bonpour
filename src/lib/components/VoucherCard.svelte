@@ -7,12 +7,15 @@
 		type VoucherTheme,
 		type VoucherThemeMode
 	} from '$lib/voucher';
+	import { getMaterialSymbol } from '$lib/material-symbols';
+	import MaterialSymbol from './MaterialSymbol.svelte';
 
 	let {
 		senderName,
 		recipientName,
 		subject,
 		quantity = null,
+		icon = '',
 		message = null,
 		expiresAt = null,
 		status = 'created',
@@ -25,6 +28,7 @@
 		recipientName: string;
 		subject: string;
 		quantity?: number | null;
+		icon?: string | null;
 		message?: string | null;
 		expiresAt?: Date | string | null;
 		status?: VoucherStatus;
@@ -35,6 +39,7 @@
 	} = $props();
 
 	const displayStatus = $derived(getDisplayStatus({ status, expiresAt }));
+	const materialSymbol = $derived(getMaterialSymbol(icon));
 	const formattedExpiration = $derived(
 		expiresAt
 			? new Intl.DateTimeFormat('fr-FR', { dateStyle: 'long', timeZone: 'UTC' }).format(
@@ -54,7 +59,9 @@
 				</p>
 			</div>
 			<div class="stamp">
-				{#if quantity}
+				{#if materialSymbol}
+					<MaterialSymbol name={materialSymbol.name} class="stamp-icon" />
+				{:else if quantity}
 					<span>× {quantity}</span>
 				{:else}
 					<span>BP</span>
@@ -172,6 +179,11 @@
 		letter-spacing: 0.08em;
 		transform: rotate(16deg);
 		width: 3.2rem;
+	}
+
+	.stamp-icon {
+		height: 1.7rem;
+		width: 1.7rem;
 	}
 
 	.voucher-theme-ocean {

@@ -3,12 +3,14 @@ import { readFileSync } from 'node:fs';
 import { Resvg } from '@resvg/resvg-js';
 import { parse } from '@twemoji/parser';
 import type { VoucherFont, VoucherTheme, VoucherThemeMode } from '$lib/voucher';
+import { getMaterialSymbol } from '$lib/material-symbols';
 
 type OgVoucher = {
 	senderName: string;
 	recipientName: string;
 	subject: string;
 	quantity: number | null;
+	icon?: string | null;
 	theme: VoucherTheme;
 	font: VoucherFont;
 	themeMode: VoucherThemeMode;
@@ -106,7 +108,7 @@ const voucherColors = {
 const require = createRequire(import.meta.url);
 const emojiSvgCache = new Map<string, string | null>();
 
-export const voucherOgRendererVersion = 4;
+export const voucherOgRendererVersion = 5;
 
 export function escapeXml(value: string) {
 	return value
@@ -262,6 +264,10 @@ export function renderVoucherSvg(voucher: OgVoucher) {
 				fill: colors.card
 			})
 		: '';
+	const icon = getMaterialSymbol(voucher.icon);
+	const stampContent = icon
+		? `<path d="${icon.path}" fill="${colors.card}" transform="translate(1008 144) scale(.067)"/>`
+		: quantity;
 
 	return `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
 	<rect width="1200" height="630" fill="${colors.page}"/>
@@ -269,7 +275,7 @@ export function renderVoucherSvg(voucher: OgVoucher) {
 	<rect x="60" y="56" width="1080" height="518" rx="14" fill="none" stroke="${colors.dashed}" stroke-width="2" stroke-dasharray="7 11"/>
 	<circle cx="1040" cy="112" r="61" fill="${colors.accent}"/>
 	<circle cx="1040" cy="112" r="49" fill="none" stroke="${colors.card}" stroke-width="2" stroke-dasharray="3 7"/>
-	${quantity}
+	${stampContent}
 	${renderText({ value: 'BON POUR', x: 110, y: 132, fontFamily: 'Arial, sans-serif', fontSize: 24, fontWeight: 700, letterSpacing: 7, fill: colors.accent })}
 	${renderText({ value: `POUR ${voucher.recipientName.toUpperCase()}`, x: 600, y: 208, textAnchor: 'middle', fontFamily: 'Arial, sans-serif', fontSize: 27, letterSpacing: 3, fill: colors.muted })}
 	${subject}

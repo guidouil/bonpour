@@ -57,6 +57,13 @@
       "when": 1780261797178,
       "tag": "0007_admin-role",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1780263159636,
+      "tag": "0008_voucher-icon",
+      "breakpoints": true
     }
   ]
 }

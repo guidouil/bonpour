@@ -1,17 +1,22 @@
 <script lang="ts">
 	import './layout.css';
-	import { assets, resolve } from '$app/paths';
+	import { asset, resolve } from '$app/paths';
 	import { page } from '$app/state';
 	import favicon from '$lib/assets/favicon.svg';
 	import type { LayoutProps } from './$types';
 
 	let { children, data }: LayoutProps = $props();
-	let defaultOgImageUrl = $derived(new URL(`${assets}/og-default.png`, page.url.origin).href);
+	let openGraphUrl = $derived(new URL(page.url.pathname, page.url.origin).href);
+	let logoUrl = $derived(new URL(favicon, page.url.origin).href);
+	let defaultOgImageUrl = $derived(new URL(asset('/og-default.png'), page.url.origin).href);
 </script>
 
 <svelte:head>
 	<link rel="icon" href={favicon} />
 	<meta name="description" content="Créez et partagez un joli Bon Pour en quelques secondes." />
+	<meta property="og:url" content={openGraphUrl} />
+	<meta property="og:type" content="website" />
+	<meta property="og:logo" content={logoUrl} />
 	{#if page.route.id !== '/b/[slug]'}
 		<meta property="og:image" content={defaultOgImageUrl} />
 		<meta property="og:image:width" content="1200" />

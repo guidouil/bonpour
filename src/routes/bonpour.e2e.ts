@@ -43,6 +43,22 @@ test('follows the OS theme by default and allows a voucher override', async ({ p
 	await expect(page.locator('.voucher-card')).toHaveCSS('background-color', 'rgb(23, 50, 56)');
 });
 
+test('selects a Material Symbol and replaces the quantity stamp in the preview', async ({
+	page
+}) => {
+	await page.goto('/');
+	await page.getByLabel('Quantité', { exact: true }).fill('2');
+	await expect(page.getByRole('button', { name: 'Café', exact: true })).not.toBeVisible();
+	await page.getByText('Icône du tampon (facultatif)', { exact: true }).click();
+
+	await expect(page.getByRole('button', { name: 'Café', exact: true })).toBeVisible();
+	await page.getByRole('button', { name: 'Café', exact: true }).click();
+
+	await expect(page.locator('input[name="icon"]')).toHaveValue('local_cafe');
+	await expect(page.locator('.stamp svg')).toBeVisible();
+	await expect(page.locator('.stamp')).not.toContainText('× 2');
+});
+
 test('creates, shares, accepts and redeems an anonymous voucher', async ({ page, request }) => {
 	const voucher = await createAnonymousVoucher(page, 'un brunch maison au lit', 'Sombre', 'Océan');
 
