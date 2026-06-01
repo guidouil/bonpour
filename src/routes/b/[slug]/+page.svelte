@@ -14,9 +14,9 @@
 </script>
 
 <svelte:head>
-	<title>Un Bon Pour pour {data.voucher.recipientName} · BonPour</title>
+	<title>Un Bon Pour {data.voucher.recipientName} · BonPour</title>
 	<meta name="robots" content="noindex,nofollow" />
-	<meta property="og:title" content="Un Bon Pour pour {data.voucher.recipientName}" />
+	<meta property="og:title" content="Un Bon Pour {data.voucher.recipientName}" />
 	<meta property="og:description" content="{data.voucher.senderName} a pensé à toi." />
 	<meta property="og:image" content={data.ogImageUrl} />
 	<meta name="twitter:card" content="summary_large_image" />

@@ -47,7 +47,7 @@
 		}
 		try {
 			await navigator.share({
-				title: `Un Bon Pour pour ${data.voucher.recipientName}`,
+				title: `Un Bon Pour ${data.voucher.recipientName}`,
 				text: `${data.voucher.senderName} t’a préparé un Bon Pour.`,
 				url: data.publicUrl
 			});
