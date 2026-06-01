@@ -1,6 +1,11 @@
 import { error, fail, redirect } from '@sveltejs/kit';
 import { getDisplayStatus } from '$lib/voucher';
-import { deleteOwnedVoucher, getVoucherForOwner, manageOwnedVoucher } from '$lib/server/vouchers';
+import {
+	deleteOwnedVoucher,
+	getVoucherForOwner,
+	manageOwnedVoucher,
+	markOwnedVoucherSent
+} from '$lib/server/vouchers';
 import type { Actions, PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ locals, params, url }) => {
@@ -16,6 +21,11 @@ export const load: PageServerLoad = async ({ locals, params, url }) => {
 };
 
 export const actions: Actions = {
+	sent: async ({ locals, params }) => {
+		if (!locals.user) redirect(303, '/connexion');
+		await markOwnedVoucherSent(params.id, locals.user.id);
+		return { success: true };
+	},
 	cancel: async ({ locals, params }) => {
 		if (!locals.user) redirect(303, '/connexion');
 		const voucher = await manageOwnedVoucher(params.id, locals.user.id, 'cancelled');

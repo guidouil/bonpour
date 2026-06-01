@@ -88,6 +88,10 @@ export async function markVoucherSent(token: string) {
 	return transitionByManagementToken(token, 'sent', 'sender');
 }
 
+export async function markOwnedVoucherSent(id: string, ownerId: string) {
+	return transitionByOwner(id, ownerId, 'sent', 'sender');
+}
+
 export async function markVoucherViewed(publicSlug: string) {
 	return transitionBySlug(publicSlug, 'viewed', 'recipient');
 }
@@ -119,11 +123,7 @@ export async function manageOwnedVoucher(
 	ownerId: string,
 	status: 'cancelled' | 'redeemed'
 ) {
-	const record = await db.query.voucher.findFirst({
-		where: and(eq(voucher.id, id), eq(voucher.ownerId, ownerId))
-	});
-	if (!record || !canTransition(getDisplayStatus(record), status)) return null;
-	return updateStatus(record, status, 'sender');
+	return transitionByOwner(id, ownerId, status, 'sender');
 }
 
 export async function deleteOwnedVoucher(id: string, ownerId: string) {
@@ -169,6 +169,14 @@ async function transitionBySlug(publicSlug: string, next: VoucherStatus, source:
 async function transitionByManagementToken(token: string, next: VoucherStatus, source: string) {
 	const record = await db.query.voucher.findFirst({
 		where: eq(voucher.managementTokenHash, hashManagementToken(token))
+	});
+	if (!record || !canTransition(getDisplayStatus(record), next)) return null;
+	return updateStatus(record, next, source);
+}
+
+async function transitionByOwner(id: string, ownerId: string, next: VoucherStatus, source: string) {
+	const record = await db.query.voucher.findFirst({
+		where: and(eq(voucher.id, id), eq(voucher.ownerId, ownerId))
 	});
 	if (!record || !canTransition(getDisplayStatus(record), next)) return null;
 	return updateStatus(record, next, source);
